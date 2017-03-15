@@ -1,19 +1,24 @@
-package src;
+package coursePlaner;
+
 
 public class User {
 
 	String userName;
-	String passWord;
-	
+	String passWord;	
 	String firstName;
 	String lastName;
 	
-
-	public User(String userName, String passWord) {
+	public User(String userName, String passWord, String firstName, String lastName) {
 		this.userName = userName;
 		this.passWord = passWord;
 		this.firstName = firstName;
 		this.lastName = lastName;
+
+	}
+	public User(String userName, String passWord) {
+		this.userName = userName;
+		this.passWord = passWord;
+		
 
 	}
 

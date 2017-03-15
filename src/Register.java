@@ -1,6 +1,8 @@
-package src;
+package coursePlaner;
+
+
 import java.io.IOException;
-import java.io.PrintWriter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,90 +13,99 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.User;
-
 @WebServlet("/Register")
-public class Register extends HttpServlet {
+public class Register extends HttpServlet
+
+{
+	String error = null;
 	private static final long serialVersionUID = 1L;
 
 	List<User> userList = new ArrayList<User>();
 
-	public Register() {
+	public Register()
+	{
 		super();
 	}
 
-	public void init(ServletConfig config) throws ServletException {
+	public void init(ServletConfig config) throws ServletException
+	{
 		super.init(config);
-		//List<User> userList = new ArrayList<User>();
 
-		userList.add(new User("cysun", "abcd"));
-		
-		userList.add(new User("cs320stu31 ", "abcd"));
-		
-		getServletContext().setAttribute("userList", userList);
 	}
 
 	protected void doGet(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+			HttpServletResponse response) throws ServletException, IOException
+	{
+		request.getRequestDispatcher("/WEB-INF/Register.jsp").forward(
+				request, response);}
 
-		PrintWriter out = response.getWriter();
-
-		response.setContentType("text/html");
-
-		out.println("<html><head><title>Register</title></head><body>");
-		out.println("<table border = '1'>");
-		out.println("<form action='Register' method='post'>");
-
-		out.println("<tr><td>Username*:</td><td> <input type='text' name='Username' /></td> <br /></tr>");
-		out.println("<tr><td>Password*:</td><td> <input type='text' name='Password' /></td> <br /></tr>");
-		out.println("<tr><td>Re-Type password*:</td><td> <input type='text' name='Re-Password' /></td> <br /></tr>");
-		out.println("<tr><td>First Name(Optional):</td><td> <input type='text' name='firstname' /></td> <br /></tr>");
-		out.println("<tr><td>Last Name(Optional):</td><td> <input type='text' name='lastname' /></td> <br /></tr>");
-		out.println("</table>");
-		out.println("<input type='submit' name='register' value='Register' /> <br />");
-		out.println("</body></html>");
-	}
-
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "unused" })
 	protected void doPost(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
-		PrintWriter out = response.getWriter();
-		List<User> myList = (List<User>)getServletContext().getAttribute("userList");
+			HttpServletResponse response) throws ServletException, IOException
+	{
+		
+		List<User> myList = (List<User>) getServletContext().getAttribute(
+				"userList");
 
 		String userName = request.getParameter("Username");
 		String passWord = request.getParameter("Password");
 		String RetypePass = request.getParameter("Re-Password");
 		String firstName = request.getParameter("firstname");
 		String lastName = request.getParameter("lastname");
-		out.println("Thank you for registering" + "<br />");
-		out.println("<p><a href='Login'>Please click here to login</a></p>");
 
-		if (userName.isEmpty() || passWord.isEmpty() || RetypePass.isEmpty()) {
-			out.println("The required fields are empty!<br/>");
-		} else if (userName.length() < 4) {
-			out.println("Username must be at least 4 characters!<br/>");
-
-		} else if (passWord.length() < 4) {
-			out.println("PassWord must be at least 4 characters<br/>");
-		} else if (!(passWord.equals(RetypePass))) {
-			out.println("Password and re-typed password do not match<br/>");
+		if (userName.isEmpty() || passWord.isEmpty() || RetypePass.isEmpty())
+		{
+			error = "The required field are empty";
+			request.setAttribute("error", error);
+			doGet(request, response);
+			return;
 		}
-		
-		for (int i = 0; i < myList.size(); i++) {
-			if (userName.equals(myList.get(i).getUsername())) 
+		else if (userName.length() < 4)
+		{
+			error = "Username must be at least 4 characters";
+			request.setAttribute("error", error);
+			doGet(request, response);
+			return;
+		}
+		else if (passWord.length() < 4)
+		{
+			error = "Password must be at least 4 characters";
+			request.setAttribute("error", error);
+			doGet(request, response);
+			return;
+		}
+		else if (!(passWord.equals(RetypePass)))
+		{
+			error = "Username must be the same as Re-Type Password ";
+			request.setAttribute("error", error);
+			doGet(request, response);
+			return;
+		}
+
+		int i;
+		for (i = 0; i < myList.size(); i++)
+		{
+			if (userName.equals(myList.get(i).userName))
 			{
-				out.println("user exists");
 
-			
-			   }
-			
+				error = "Username exists ";
+				request.setAttribute("error", error);
+				doGet(request, response);
+
+				return;
+
 			}
-			
-             User myUsers = new User(userName, passWord);
-			 // myList.add(new User())
-			//getServletContext().setAttribute( "userList", userList );
-			//response.sendRedirect("Login");
-			
+			else
+			{
+
+				User myUsers = new User(userName, passWord);
+				myList.add(myUsers);
+			    response.sendRedirect("Login");
+				return;
+			}
+
 		}
+
 	}
 
+}
