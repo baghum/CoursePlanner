@@ -1,5 +1,4 @@
 package src;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -12,79 +11,87 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.User;
+
 @WebServlet("/EditCourse")
-public class EditCourse extends HttpServlet
-{
+public class EditCourse extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	public EditCourse()
-	{
+	public EditCourse() {
 		super();
 	}
 
 	@SuppressWarnings("unchecked")
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException
-	{
-		List<Courses> enteries = (List<Courses>) getServletContext().getAttribute(
-				"courses");
-
-		int index = Integer.valueOf(request.getParameter("index"));
-
-		Courses entry = enteries.get(index);
-
-		PrintWriter out = response.getWriter();
-
-		response.setContentType("text/html");
-
-		out.println("<html><head><title>Edit Course</title></head><body>");
-		out.println("<table border = '1' > ");
-		out.println("<form action='EditCourse' method='post'>");
-		out.println("<tr><td>Code:</td><td> <input type='text'  name='code' value = '"
-				+ entry.getCode() + "'></td></tr> <br />");
-
-		out.println("<tr><td>Title:</td><td> <input type='text' size= '45' name='title' value='"
-				+ entry.getTitle() + "' /></td></tr> <br />");
-		out.println("<tr><td>Prerequisite(s): </td><td> <br />");
-
-		for (Courses c : enteries)
-		{
-			if(!c.getCode().equals(entry.getCode()))
-			{
-				if(entry.getPrerequisites().contains(c.getCode()))
-				{
-					out.println("<input type='checkbox' name = 'check' checked value='" + c.getCode()
-							+ "'>" + c.getCode() + "</br>");
-				}
-				else
-				{
-					out.println("<input type='checkbox' name = 'check' value='" + c.getCode() + "'>"
-							+ c.getCode() + "</br>");
-				}
-			}
+	protected void doGet(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+		List<Courses> enteries = (List<Courses>) getServletContext()
+				.getAttribute("courses");
+		String user = (String) request.getSession().getAttribute("user");
+		String pass = (String) request.getSession().getAttribute("pass");
+		List<User> myList = (List<User>)getServletContext().getAttribute( "userList");
+		String userID = null;
+		String passId = null;
+		for(int i = 0; i < myList.size(); i++){
+		 userID =myList.get(i).getUsername(); 
+		 passId = myList.get(i).getPassword();
 		}
 
-		out.println("</table>");
-		out.println("<input type = 'hidden' name = 'index' value = '" + index + "'/>");
-		out.println("<input type='submit' name='save' value='Save' /> <br />");
-		out.println("</body></html>");
+		if ((user != null) && (user.equals(userID)) && passId.equals(pass)) {
+
+			int index = Integer.valueOf(request.getParameter("index"));
+
+			Courses entry = enteries.get(index);
+
+			PrintWriter out = response.getWriter();
+
+			response.setContentType("text/html");
+
+			out.println("<html><head><title>Edit Course</title></head><body>");
+			out.println("<table border = '1' > ");
+			out.println("<form action='EditCourse' method='post'>");
+			out.println("<tr><td>Code:</td><td> <input type='text'  name='code' value = '"
+					+ entry.getCode() + "'></td></tr> <br />");
+
+			out.println("<tr><td>Title:</td><td> <input type='text' size= '45' name='title' value='"
+					+ entry.getTitle() + "' /></td></tr> <br />");
+			out.println("<tr><td>Prerequisite(s): </td><td> <br />");
+
+			for (Courses c : enteries) {
+				if (!c.getCode().equals(entry.getCode())) {
+					if (entry.getPrerequisites().contains(c.getCode())) {
+						out.println("<input type='checkbox' name = 'check' checked value='"
+								+ c.getCode() + "'>" + c.getCode() + "</br>");
+					} else {
+						out.println("<input type='checkbox' name = 'check' value='"
+								+ c.getCode() + "'>" + c.getCode() + "</br>");
+					}
+				}
+			}
+
+			out.println("</table>");
+			out.println("<input type = 'hidden' name = 'index' value = '"
+					+ index + "'/>");
+			out.println("<input type='submit' name='save' value='Save' /> <br />");
+			out.println("</body></html>");
+		} else {
+			response.sendRedirect("Login");
+		}
 	}
 
 	@SuppressWarnings("unchecked")
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException
+	protected void doPost(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException
 
 	{
-		List<Courses> enteries = (List<Courses>) getServletContext().getAttribute(
-				"courses");
+		List<Courses> enteries = (List<Courses>) getServletContext()
+				.getAttribute("courses");
 
 		String code = request.getParameter("code");
 		String title = request.getParameter("title");
 		String[] check = request.getParameterValues("check");
 		int index = Integer.parseInt(request.getParameter("index"));
 
-		if(check != null)
-		{
+		if (check != null) {
 			List<String> Pre = new ArrayList<String>(Arrays.asList(check));
 
 			enteries.get(index).setCode(code);
@@ -92,9 +99,7 @@ public class EditCourse extends HttpServlet
 			enteries.get(index).setPrerequisites(Pre);
 
 			// enteries.add(new Courses(code, title, Pre));
-		}
-		else
-		{
+		} else {
 			enteries.get(index).setCode(code);
 			enteries.get(index).setTitle(title);
 			// enteries.add(new Courses(code, title, new ArrayList<String>()));

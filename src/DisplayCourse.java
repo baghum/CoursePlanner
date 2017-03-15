@@ -1,5 +1,4 @@
 package src;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -17,60 +16,48 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/DisplayCourse")
-public class DisplayCourse extends HttpServlet
-{
+public class DisplayCourse extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	List<Courses> enteries = new ArrayList<Courses>();
 
-	public DisplayCourse()
-	{
+	public DisplayCourse() {
 		super();
 
 	}
 
-	public void init(ServletConfig config) throws ServletException
-	{
+	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 
-		File file = new File(getServletContext().getRealPath("/WEB-INF/courses.txt"));
-		try
-		{
+		File file = new File(getServletContext().getRealPath(
+				"/WEB-INF/courses.txt"));
+		try {
 			@SuppressWarnings("resource")
 			Scanner s = new Scanner(file);
-			while (s.hasNextLine())
-			{
+			while (s.hasNextLine()) {
 				String line = s.nextLine();
 
-				if(line.startsWith("#"))
-				{
+				if (line.startsWith("#")) {
 					// do nothing
-				}
-				else if(line.length() == 0)
-				{
+				} else if (line.length() == 0) {
 					// do nothing
 				}
 
-				else
-				{
+				else {
 					String[] kp = line.split(",");
 
-					if(kp.length == 3)
-					{
+					if (kp.length == 3) {
 						String[] prereq = kp[2].split(" ");
 						List<String> listOfPre = new ArrayList<String>(
 								Arrays.asList(prereq));
 						enteries.add(new Courses(kp[0], kp[1], listOfPre));
-					}
-					else
-					{
-						enteries.add(new Courses(kp[0], kp[1], new ArrayList<String>()));
+					} else {
+						enteries.add(new Courses(kp[0], kp[1],
+								new ArrayList<String>()));
 					}
 
 				}
 			}
-		}
-		catch (FileNotFoundException e)
-		{
+		} catch (FileNotFoundException e) {
 
 			e.printStackTrace();
 		}
@@ -80,12 +67,13 @@ public class DisplayCourse extends HttpServlet
 	}
 
 	@SuppressWarnings("unchecked")
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException
-	{
+	protected void doGet(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
 
-		List<Courses> enteries = (List<Courses>) getServletContext().getAttribute(
-				"courses");
+		String user = (String) request.getSession().getAttribute("user");
+
+		List<Courses> enteries = (List<Courses>) getServletContext()
+				.getAttribute("courses");
 
 		PrintWriter out = response.getWriter();
 
@@ -94,11 +82,10 @@ public class DisplayCourse extends HttpServlet
 		out.print("<html><head><title>Display Courses</title></head><body>");
 		out.println("<table border='1'>");
 		out.println("<tr><th>Code</th><th>Title</th><th>Prerequisites</th><th>Operation</th><th></tr>");
-		for (int i = 0; i < enteries.size(); ++i)
-		{
+		for (int i = 0; i < enteries.size(); ++i) {
 			Courses entry = enteries.get(i);
-			out.print("<tr><td>" + entry.getCode() + "</td><td> " + entry.getTitle()
-					+ "</td><td>");
+			out.print("<tr><td>" + entry.getCode() + "</td><td> "
+					+ entry.getTitle() + "</td><td>");
 			for (String s : entry.getPrerequisites())
 				out.println(s + " ");
 			out.println("</td><td><a href ='EditCourse?index=" + i
@@ -106,7 +93,15 @@ public class DisplayCourse extends HttpServlet
 		}
 		out.println("</table>");
 		out.println("<p><a href='AddCourse'>Add Course</a></p>");
+		
+		if(user == null){
 		out.println("<p><a href='Login'>Login</a></p>");
+		}
+		else{
+		out.println("<p><a href='Logout'>Logout</a></p>");
+	}
+		out.println("<p><a href='Register'>Register</a></p>");
+		
 		out.print("</body></html>");
 
 	}

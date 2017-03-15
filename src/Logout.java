@@ -21,7 +21,7 @@ public class Logout extends HttpServlet
 			throws ServletException, IOException
 	{
 		request.getSession().invalidate();
-		response.sendRedirect("Login");
+		response.sendRedirect("DisplayCourse");
 	}
 
 }
